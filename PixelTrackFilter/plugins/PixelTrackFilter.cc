@@ -203,13 +203,13 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else{
 
-    edm::Handle<reco::VertexCollection> vertices;
-    iEvent.getByToken(vertexSrc_,vertices);
-    double bestvz=-999.9, bestvx=-999.9, bestvy=-999.9;
-    double bestvzError=-999.9, bestvxError=-999.9, bestvyError=-999.9;
-    const reco::Vertex & vtx = (*vertices)[0];
-    bestvz = vtx.z(); bestvx = vtx.x(); bestvy = vtx.y();
-    bestvzError = vtx.zError(); bestvxError = vtx.xError(); bestvyError = vtx.yError();
+    // edm::Handle<reco::VertexCollection> vertices;
+    // iEvent.getByToken(vertexSrc_,vertices);
+    // double bestvz=-999.9, bestvx=-999.9, bestvy=-999.9;
+    // double bestvzError=-999.9, bestvxError=-999.9, bestvyError=-999.9;
+    // const reco::Vertex & vtx = (*vertices)[0];
+    // bestvz = vtx.z(); bestvx = vtx.x(); bestvy = vtx.y();
+    // bestvzError = vtx.zError(); bestvxError = vtx.xError(); bestvyError = vtx.yError();
 
     Handle<edm::View<reco::Track>> tracks;
     iEvent.getByToken(trackSrc_, tracks);
@@ -218,17 +218,8 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        const reco::Track & trk = (*tracks)[it];
 
-       math::XYZPoint bestvtx(bestvx,bestvy,bestvz);
-          
-          double dzvtx = trk.dz(bestvtx);
-          double dxyvtx = trk.dxy(bestvtx);
-          double dzerror = sqrt(trk.dzError()*trk.dzError()+bestvzError*bestvzError);
-          double dxyerror = sqrt(trk.d0Error()*trk.d0Error()+bestvxError*bestvyError);
-   
+          if( trk.algo() != 4 ) continue;
           if(!trk.quality(reco::TrackBase::highPurity)) continue;
-          if(fabs(trk.ptError())/trk.pt() > 0.1 ) continue;
-          if(fabs(dzvtx/dzerror) > 3.0) continue;
-          if(fabs(dxyvtx/dxyerror) > 3.0) continue;
           if(fabs(trk.eta()) < 2.4 && trk.pt() > 0.4 ){nMult_ass_good++;}// NtrkOffline        
 
       } 
