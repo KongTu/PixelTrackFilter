@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-highMultFilter = cms.EDFilter('HighMultFilter',
+pixelTrackFilter = cms.EDFilter('PixelTrackFilter',
                                   multMax = cms.double(100000),
                                   multMin = cms.double(120),
                                   etaMax = cms.double(2.4),

@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    HighMultFilter/HighMultFilter
-// Class:      HighMultFilter
+// Package:    PixelTrackFilter/PixelTrackFilter
+// Class:      PixelTrackFilter
 // 
-/**\class HighMultFilter HighMultFilter.cc HighMultFilter/HighMultFilter/plugins/HighMultFilter.cc
+/**\class PixelTrackFilter PixelTrackFilter.cc PixelTrackFilter/PixelTrackFilter/plugins/PixelTrackFilter.cc
 
  Description: [one line class summary]
 
@@ -66,13 +66,10 @@
 
 #include "DataFormats/Candidate/interface/Candidate.h"
 
-#include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
-#include "DataFormats/Candidate/interface/VertexCompositeCandidateFwd.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-#include "DataFormats/TrackReco/interface/DeDxData.h"
 
 #include <Math/Functions.h>
 #include <Math/SVector.h>
@@ -88,8 +85,6 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
-#include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitCollection.h"
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -100,39 +95,12 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-#include "SimDataFormats/TrackingHit/interface/PSimHit.h"
-#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
-#include "SimTracker/TrackerHitAssociation/interface/TrackerHitAssociator.h"
-
-#include "DataFormats/SiPixelDetId/interface/PixelEndcapName.h"
-
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMapRecord.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMap.h"
-
-
 #include "DataFormats/Math/interface/Point3D.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticleFwd.h"
-#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
-#include "DataFormats/RecoCandidate/interface/TrackAssociation.h"
-#include "DataFormats/TrackReco/interface/DeDxData.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
-// Particle Flow
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-#include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
-#include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
-#include "DataFormats/ParticleFlowReco/interface/PFClusterFwd.h"
 
 // Vertex significance
 #include "RecoBTag/SecondaryVertex/interface/SecondaryVertex.h"
@@ -153,10 +121,10 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class HighMultFilter : public edm::EDFilter {
+class PixelTrackFilter : public edm::EDFilter {
 public:
-    explicit HighMultFilter(const edm::ParameterSet&);
-    ~HighMultFilter();
+    explicit PixelTrackFilter(const edm::ParameterSet&);
+    ~PixelTrackFilter();
     virtual void endJob() ;
     virtual bool filter(edm::Event&, const edm::EventSetup&);
 private:
@@ -186,7 +154,7 @@ private:
 //
 // constructors and destructor
 //
-HighMultFilter::HighMultFilter(const edm::ParameterSet& iConfig) :
+PixelTrackFilter::PixelTrackFilter(const edm::ParameterSet& iConfig) :
 genSrc_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genSrc"))),
 vertexSrc_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
 trackSrc_(consumes<edm::View<reco::Track> >(iConfig.getParameter<edm::InputTag>("trackSrc"))),
@@ -200,13 +168,13 @@ doGenParticle_(iConfig.getParameter<bool>("doGenParticle"))
 }
 
 
-HighMultFilter::~HighMultFilter()
+PixelTrackFilter::~PixelTrackFilter()
 {
 
 }
 
 bool
-HighMultFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     using namespace edm;
     bool accepted = false;
@@ -271,7 +239,7 @@ HighMultFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     return accepted;
 }
 void
-HighMultFilter::endJob()
+PixelTrackFilter::endJob()
 {
 }
-DEFINE_FWK_MODULE(HighMultFilter);
+DEFINE_FWK_MODULE(PixelTrackFilter);
