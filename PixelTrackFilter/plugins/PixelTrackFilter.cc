@@ -214,15 +214,12 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     Handle<edm::View<reco::Track>> tracks;
     iEvent.getByToken(trackSrc_, tracks);
 
-    std::cout << "size: " << tracks->size() << std::endl;
-
       for(unsigned it = 0; it < tracks->size(); it++){
 
        const reco::Track & trk = (*tracks)[it];
 
-          //if( trk.algo() != 4 ) continue;
-          //if(!trk.quality(reco::TrackBase::highPurity)) continue;
-          std::cout << "pt : " << trk.pt() << " eta: " << trk.eta() << std::endl;
+          if( trk.algo() != 4 ) continue;
+          if(!trk.quality(reco::TrackBase::highPurity)) continue;
           if(fabs(trk.eta()) < 2.4 && trk.pt() > 0.4 ){nMult_ass_good++;}// NtrkOffline        
 
       } 
