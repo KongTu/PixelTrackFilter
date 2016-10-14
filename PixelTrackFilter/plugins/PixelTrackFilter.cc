@@ -214,6 +214,8 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     Handle<edm::View<reco::Track>> tracks;
     iEvent.getByToken(trackSrc_, tracks);
 
+    std::cout << "size: " << tracks->size() << std::endl;
+
       for(unsigned it = 0; it < tracks->size(); it++){
 
        const reco::Track & trk = (*tracks)[it];
