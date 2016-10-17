@@ -219,8 +219,7 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
        const reco::Track & trk = (*tracks)[it];
 
           if( trk.algo() != 4 ) continue;
-          if(!trk.quality(reco::TrackBase::highPurity)) continue;
-          if(fabs(trk.eta()) < 2.4 && trk.pt() > 0.4 ){nMult_ass_good++;}// NtrkOffline        
+          if( trk.pt() > 0.4 ){nMult_ass_good++;}// NtrkOffline        
 
       } 
     }
