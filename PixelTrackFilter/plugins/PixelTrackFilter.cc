@@ -56,6 +56,12 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
+// Particle Flow
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
+#include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
+#include "DataFormats/ParticleFlowReco/interface/PFClusterFwd.h"
+
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 
@@ -237,8 +243,8 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for( unsigned ic = 0; ic < pfCandidates->size(); ic++ ) {
 
         const reco::PFCandidate& cand = (*pfCandidates)[ic];
-        double ecalEnergy = cand->ecalEnergy();
-        double hcalEnergy = cand->hcalEnergy();
+        double ecalEnergy = cand.ecalEnergy();
+        double hcalEnergy = cand.hcalEnergy();
 
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > 3.0 && cand.eta() < 5.0 ) towerPlus++;
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > -5.0 && cand.eta() < -3.0 ) towerMinus++;
