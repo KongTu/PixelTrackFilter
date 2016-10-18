@@ -237,8 +237,8 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for( unsigned ic = 0; ic < pfCandidates->size(); ic++ ) {
 
         const reco::PFCandidate& cand = (*pfCandidates)[ic];
-        ecalEnergy = cand.ecalEnergy();
-        hcalEnergy = cand.hcalEnergy();
+        double ecalEnergy = cand.ecalEnergy();
+        double hcalEnergy = cand.hcalEnergy();
 
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > 3.0 && cand.eta() < 5.0 ) towerPlus++;
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > -5.0 && cand.eta() < -3.0 ) towerMinus++;
