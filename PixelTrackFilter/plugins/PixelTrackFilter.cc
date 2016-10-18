@@ -140,6 +140,7 @@ private:
     double etaMin_;
 
     bool doGenParticle_;
+    bool doDS_;
 
     
 };
@@ -164,7 +165,8 @@ multMax_(iConfig.getParameter<double>("multMax")),
 multMin_(iConfig.getParameter<double>("multMin")),
 etaMax_(iConfig.getParameter<double>("etaMax")),
 etaMin_(iConfig.getParameter<double>("etaMin")),
-doGenParticle_(iConfig.getParameter<bool>("doGenParticle"))
+doGenParticle_(iConfig.getParameter<bool>("doGenParticle")),
+doDS_(iConfig.getParameter<bool>("doDS"))
 {
     
 }
@@ -228,9 +230,27 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     Handle<reco::PFCandidateCollection> pfCandidates;
     iEvent.getByToken(pfCandSrc_, pfCandidates);
-    if( !pfCandidates.isValid() ) return false;
-    
-    if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
+
+    double towerPlus = 0.0;
+    double towerMinus = 0.0;
+
+    for( unsigned ic = 0; ic < pfCandidates->size(); ic++ ) {
+
+        const reco::PFCandidate& cand = (*pfCandidates)[ic];
+        ecalEnergy = cand.ecalEnergy();
+        hcalEnergy = cand.hcalEnergy();
+
+        if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > 3.0 && cand.eta() < 5.0 ) towerPlus++;
+        if( ( ecalEnergy+hcalEnergy ) > 3.0 && cand.eta() > -5.0 && cand.eta() < -3.0 ) towerMinus++;
+
+    }
+
+    if( doDS_ ){
+        if( towerPlus > 0.0 && towerMinus > 0.0 ) accepted = true;
+    }
+    else{
+        if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
+    }
     
     return accepted;
 }
