@@ -132,6 +132,7 @@ private:
     edm::EDGetTokenT<reco::GenParticleCollection> genSrc_;
     edm::EDGetTokenT<reco::VertexCollection> vertexSrc_;
     edm::EDGetTokenT<edm::View<reco::Track> > trackSrc_;
+    edm::EDGetTokenT<reco::PFCandidateCollection> pfCandSrc_;
     
     double multMax_;
     double multMin_;
@@ -158,6 +159,7 @@ PixelTrackFilter::PixelTrackFilter(const edm::ParameterSet& iConfig) :
 genSrc_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genSrc"))),
 vertexSrc_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
 trackSrc_(consumes<edm::View<reco::Track> >(iConfig.getParameter<edm::InputTag>("trackSrc"))),
+pfCandSrc_(consumes<reco::PFCandidateCollection >(iConfig.getParameter<edm::InputTag>("pfCandSrc"))),
 multMax_(iConfig.getParameter<double>("multMax")),
 multMin_(iConfig.getParameter<double>("multMin")),
 etaMax_(iConfig.getParameter<double>("etaMax")),
@@ -223,6 +225,10 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       } 
     }
+
+    Handle<reco::PFCandidateCollection> pfCandidates;
+    iEvent.getByToken(pfCandSrc_, pfCandidates);
+    if( !pfCandidates.isValid() ) return;
     
     if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
     
