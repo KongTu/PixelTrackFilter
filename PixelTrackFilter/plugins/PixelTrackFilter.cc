@@ -228,7 +228,7 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     Handle<reco::PFCandidateCollection> pfCandidates;
     iEvent.getByToken(pfCandSrc_, pfCandidates);
-    if( !pfCandidates.isValid() ) return;
+    if( !pfCandidates.isValid() ) return false;
     
     if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
     
