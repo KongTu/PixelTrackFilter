@@ -213,14 +213,6 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     else{
 
-    // edm::Handle<reco::VertexCollection> vertices;
-    // iEvent.getByToken(vertexSrc_,vertices);
-    // double bestvz=-999.9, bestvx=-999.9, bestvy=-999.9;
-    // double bestvzError=-999.9, bestvxError=-999.9, bestvyError=-999.9;
-    // const reco::Vertex & vtx = (*vertices)[0];
-    // bestvz = vtx.z(); bestvx = vtx.x(); bestvy = vtx.y();
-    // bestvzError = vtx.zError(); bestvxError = vtx.xError(); bestvyError = vtx.yError();
-
     Handle<edm::View<reco::Track>> tracks;
     iEvent.getByToken(trackSrc_, tracks);
 
@@ -233,6 +225,15 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       } 
     }
+
+    edm::Handle<reco::VertexCollection> vertices;
+    iEvent.getByToken(vertexSrc_,vertices);
+    double bestvz=-999.9;
+    const reco::Vertex & vtx = (*vertices)[0];
+    bestvz = vtx.z(); 
+    bool validVertex = false;
+    if( !bestvz.isFake() && bestvz.tracksSize() >= 2 ) validVertex = true; //valid vertex selection
+
 
     Handle<reco::PFCandidateCollection> pfCandidates;
     iEvent.getByToken(pfCandSrc_, pfCandidates);
@@ -252,7 +253,7 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
     if( doDS_ ){
-        if( towerPlus > 0.0 && towerMinus > 0.0 ) accepted = true;
+        if( towerPlus > 0.0 && towerMinus > 0.0 && validVertex ) accepted = true;
     }
     else{
         if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
