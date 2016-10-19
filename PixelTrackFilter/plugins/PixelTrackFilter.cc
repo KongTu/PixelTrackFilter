@@ -232,7 +232,7 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     const reco::Vertex & vtx = (*vertices)[0];
     bestvz = vtx.z(); 
     bool validVertex = false;
-    if( !bestvz.isFake() && bestvz.tracksSize() >= 2 ) validVertex = true; //valid vertex selection
+    if( !vtx.isFake() && vtx.tracksSize() >= 2 && fabs(bestvz) < 15 ) validVertex = true; //valid vertex selection
 
 
     Handle<reco::PFCandidateCollection> pfCandidates;
