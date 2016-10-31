@@ -139,6 +139,7 @@ private:
     edm::EDGetTokenT<reco::VertexCollection> vertexSrc_;
     edm::EDGetTokenT<edm::View<reco::Track> > trackSrc_;
     edm::EDGetTokenT<reco::PFCandidateCollection> pfCandSrc_;
+    edm::EDGetTokenT<CaloTowerCollection> towerSrc_;
     
     double multMax_;
     double multMin_;
@@ -147,6 +148,7 @@ private:
 
     bool doGenParticle_;
     bool doDS_;
+    bool doDS_caloTower_;
 
     
 };
@@ -167,12 +169,14 @@ genSrc_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag
 vertexSrc_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
 trackSrc_(consumes<edm::View<reco::Track> >(iConfig.getParameter<edm::InputTag>("trackSrc"))),
 pfCandSrc_(consumes<reco::PFCandidateCollection >(iConfig.getParameter<edm::InputTag>("pfCandSrc"))),
+towerSrc_(consumes<CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("towerSrc"))),
 multMax_(iConfig.getParameter<double>("multMax")),
 multMin_(iConfig.getParameter<double>("multMin")),
 etaMax_(iConfig.getParameter<double>("etaMax")),
 etaMin_(iConfig.getParameter<double>("etaMin")),
 doGenParticle_(iConfig.getParameter<bool>("doGenParticle")),
-doDS_(iConfig.getParameter<bool>("doDS"))
+doDS_(iConfig.getParameter<bool>("doDS")),
+doDS_caloTower_(iConfig.getParameter<bool>("doDS_caloTower"))
 {
     
 }
@@ -240,7 +244,6 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     double towerPlus = 0.0;
     double towerMinus = 0.0;
-
     for( unsigned ic = 0; ic < pfCandidates->size(); ic++ ) {
 
         const reco::PFCandidate& cand = (*pfCandidates)[ic];
@@ -252,8 +255,27 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }
 
+    Handle<CaloTowerCollection> towers;
+    iEvent.getByToken(towerSrc_, towers);
+
+    
+    double caloTowerPlus = 0.0;
+    double caloTowerMinus = 0.0;
+    for(unsigned i = 0; i < towers->size(); ++i){
+
+        const CaloTower & hit= (*towers)[i];
+        double ecalEnergy = cand.emEnergy();
+        double hcalEnergy = cand.hadEnergy();
+        
+        if( ( ecalEnergy+hcalEnergy ) > 3.0 && hit.eta() > 3.0 && hit.eta() < 5.0 ) caloTowerPlus++;
+        if( ( ecalEnergy+hcalEnergy ) > 3.0 && hit.eta() > -5.0 && hit.eta() < -3.0 ) caloTowerMinus++;
+
+    }
+    if( doDS_caloTower_ ){
+        if( caloTowerPlus > 0.0 && caloTowerMinus > 0.0 ) accepted = true;
+    }
     if( doDS_ ){
-        if( towerPlus > 0.0 && towerMinus > 0.0 && validVertex ) accepted = true;
+        if( towerPlus > 0.0 && towerMinus > 0.0 ) accepted = true;
     }
     else{
         if(nMult_ass_good>=multMin_ && nMult_ass_good<multMax_) accepted = true;
