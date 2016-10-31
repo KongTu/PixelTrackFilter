@@ -264,8 +264,8 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(unsigned i = 0; i < towers->size(); ++i){
 
         const CaloTower & hit= (*towers)[i];
-        double ecalEnergy = cand.emEnergy();
-        double hcalEnergy = cand.hadEnergy();
+        double ecalEnergy = hit.emEnergy();
+        double hcalEnergy = hit.hadEnergy();
         
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && hit.eta() > 3.0 && hit.eta() < 5.0 ) caloTowerPlus++;
         if( ( ecalEnergy+hcalEnergy ) > 3.0 && hit.eta() > -5.0 && hit.eta() < -3.0 ) caloTowerMinus++;
