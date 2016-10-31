@@ -237,7 +237,9 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     bestvz = vtx.z(); 
     bool validVertex = false;
     if( !vtx.isFake() && vtx.tracksSize() >= 2 && fabs(bestvz) < 15 ) validVertex = true; //valid vertex selection
-
+    if(validVertex){
+        
+    }
 
     Handle<reco::PFCandidateCollection> pfCandidates;
     iEvent.getByToken(pfCandSrc_, pfCandidates);
@@ -258,7 +260,6 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     Handle<CaloTowerCollection> towers;
     iEvent.getByToken(towerSrc_, towers);
 
-    
     double caloTowerPlus = 0.0;
     double caloTowerMinus = 0.0;
     for(unsigned i = 0; i < towers->size(); ++i){
