@@ -149,6 +149,7 @@ private:
     bool doGenParticle_;
     bool doDS_;
     bool doDS_caloTower_;
+    bool doDS_caloTower_vtx_;
 
     
 };
@@ -176,7 +177,9 @@ etaMax_(iConfig.getParameter<double>("etaMax")),
 etaMin_(iConfig.getParameter<double>("etaMin")),
 doGenParticle_(iConfig.getParameter<bool>("doGenParticle")),
 doDS_(iConfig.getParameter<bool>("doDS")),
-doDS_caloTower_(iConfig.getParameter<bool>("doDS_caloTower"))
+doDS_caloTower_(iConfig.getParameter<bool>("doDS_caloTower")),
+doDS_caloTower_vtx_(iConfig.getParameter<bool>("doDS_caloTower_vtx"))
+
 {
     
 }
@@ -237,9 +240,6 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     bestvz = vtx.z(); 
     bool validVertex = false;
     if( !vtx.isFake() && vtx.tracksSize() >= 2 && fabs(bestvz) < 15 ) validVertex = true; //valid vertex selection
-    if(validVertex){
-        
-    }
 
     Handle<reco::PFCandidateCollection> pfCandidates;
     iEvent.getByToken(pfCandSrc_, pfCandidates);
@@ -274,6 +274,9 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
     if( doDS_caloTower_ ){
         if( caloTowerPlus > 0.0 && caloTowerMinus > 0.0 ) accepted = true;
+    }
+    if( doDS_caloTower_vtx_ ){
+        if( caloTowerPlus > 0.0 && caloTowerMinus > 0.0 && validVertex ) accepted = true;
     }
     if( doDS_ ){
         if( towerPlus > 0.0 && towerMinus > 0.0 ) accepted = true;
