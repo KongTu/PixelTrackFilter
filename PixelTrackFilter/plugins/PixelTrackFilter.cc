@@ -48,7 +48,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
@@ -75,6 +74,9 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 
 #include <Math/Functions.h>
@@ -96,7 +98,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
@@ -107,6 +108,8 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
+#include "FWCore/Utilities/interface/StreamID.h"
+#include "FWCore/Framework/interface/stream/EDFilter.h"
 
 // Vertex significance
 #include "RecoBTag/SecondaryVertex/interface/SecondaryVertex.h"
@@ -126,7 +129,7 @@
 // from  edm::one::EDAnalyzer<> and also remove the line from
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
-
+/*
 class PixelTrackFilter : public edm::EDFilter {
 public:
     explicit PixelTrackFilter(const edm::ParameterSet&);
@@ -152,8 +155,37 @@ private:
     bool doDS_caloTower_vtx_;
 
     
-};
+};*/
 
+class PixelTrackFilter : public edm::stream::EDFilter<> {
+   public:
+      explicit PixelTrackFilter(const edm::ParameterSet&);
+      ~PixelTrackFilter();
+
+
+
+   private:
+      virtual void beginStream(edm::StreamID) override;
+      virtual bool filter(edm::Event&, const edm::EventSetup&) override;
+      virtual void endStream() override;
+
+      edm::EDGetTokenT<reco::GenParticleCollection> genSrc_;
+      edm::EDGetTokenT<reco::VertexCollection> vertexSrc_;
+      edm::EDGetTokenT<edm::View<reco::Track> > trackSrc_;
+      edm::EDGetTokenT<reco::PFCandidateCollection> pfCandSrc_;
+      edm::EDGetTokenT<CaloTowerCollection> towerSrc_;
+
+      double multMax_;
+      double multMin_;
+      double etaMax_;
+      double etaMin_;
+
+      bool doGenParticle_;
+      bool doDS_;
+      bool doDS_caloTower_;
+      bool doDS_caloTower_vtx_;
+
+};
 //
 // constants, enums and typedefs
 //
@@ -165,7 +197,8 @@ private:
 //
 // constructors and destructor
 //
-PixelTrackFilter::PixelTrackFilter(const edm::ParameterSet& iConfig) :
+PixelTrackFilter::PixelTrackFilter(const edm::ParameterSet& iConfig)
+/*
 genSrc_(consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genSrc"))),
 vertexSrc_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"))),
 trackSrc_(consumes<edm::View<reco::Track> >(iConfig.getParameter<edm::InputTag>("trackSrc"))),
@@ -179,9 +212,21 @@ doGenParticle_(iConfig.getParameter<bool>("doGenParticle")),
 doDS_(iConfig.getParameter<bool>("doDS")),
 doDS_caloTower_(iConfig.getParameter<bool>("doDS_caloTower")),
 doDS_caloTower_vtx_(iConfig.getParameter<bool>("doDS_caloTower_vtx"))
-
+*/
 {
-    
+genSrc_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genSrc"));
+vertexSrc_ = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexSrc"));
+trackSrc_ = consumes<edm::View<reco::Track> >(iConfig.getParameter<edm::InputTag>("trackSrc"));   
+pfCandSrc_ = consumes<reco::PFCandidateCollection>(iConfig.getParameter<edm::InputTag>("pfCandSrc"));
+towerSrc_ = consumes<CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("towerSrc"));
+multMax_ = iConfig.getParameter<double>("multMax");
+multMin_ = iConfig.getParameter<double>("multMin");
+etaMax_ = iConfig.getParameter<double>("etaMax");
+etaMin_ = iConfig.getParameter<double>("etaMin");
+doGenParticle_ = iConfig.getParameter<bool>("doGenParticle");
+doDS_ = iConfig.getParameter<bool>("doDS");
+doDS_caloTower_ = iConfig.getParameter<bool>("doDS_caloTower");
+doDS_caloTower_vtx_ = iConfig.getParameter<bool>("doDS_caloTower_vtx");
 }
 
 
@@ -288,7 +333,15 @@ PixelTrackFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     return accepted;
 }
 void
-PixelTrackFilter::endJob()
+PixelTrackFilter::beginStream(edm::StreamID)
 {
 }
+
+// ------------ method called once each stream after processing all runs, lumis and events  ------------
+void
+PixelTrackFilter::endStream()
+{
+}
+
 DEFINE_FWK_MODULE(PixelTrackFilter);
+
